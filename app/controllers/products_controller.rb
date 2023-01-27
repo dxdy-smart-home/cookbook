@@ -1,6 +1,6 @@
 class ProductsController < ApplicationController
   def index
-    products = current_user.products.includes(:categories)
+    products = Product.includes(:categories)
     grouped_products = products.each_with_object(Hash.new(SortedSet.new)) do |product, hash|
       product.categories.each { |category| hash[category] |= [product] }
       hash
@@ -10,12 +10,11 @@ class ProductsController < ApplicationController
   end
 
   def new
-    product = current_user.products.build
-    render locals: { product: product, categories: categories_resource }
+    render locals: { product: Product.new, categories: categories_resource }
   end
 
   def create
-    product = current_user.products.build product_params
+    product = Product.new product_params
 
     if product.save
       redirect_to products_path, notice: "Продукт успешно создан"
@@ -25,12 +24,12 @@ class ProductsController < ApplicationController
   end
 
   def edit
-    product = current_user.products.find params[:id]
+    product = Product.find params[:id]
     render locals: { product: product, categories: categories_resource }
   end
 
   def update
-    product = current_user.products.find params[:id]
+    product = Product.find params[:id]
 
     if product.update product_params
       redirect_to products_path, notice: "Продукт успешно обновлен"
@@ -40,7 +39,7 @@ class ProductsController < ApplicationController
   end
 
   def destroy
-    product = current_user.products.find params[:id]
+    product = Product.find params[:id]
     product.destroy
 
     redirect_to products_path, notice: "Продукт успешно удален"
@@ -49,7 +48,7 @@ class ProductsController < ApplicationController
   private
 
   def categories_resource
-    @categories_resource ||= Tag.categories.ordered
+    @categories_resource ||= Category.ordered
   end
 
   def product_params

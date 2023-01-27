@@ -11,8 +11,6 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
-SET default_table_access_method = heap;
-
 --
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
@@ -32,7 +30,6 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.dishes (
     id bigint NOT NULL,
     name character varying NOT NULL,
-    author_id bigint NOT NULL,
     servings_number integer NOT NULL,
     cooking_time integer NOT NULL,
     comment character varying,
@@ -53,13 +50,6 @@ COMMENT ON TABLE public.dishes IS 'Блюда';
 --
 
 COMMENT ON COLUMN public.dishes.name IS 'Название';
-
-
---
--- Name: COLUMN dishes.author_id; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.dishes.author_id IS 'Автор';
 
 
 --
@@ -178,7 +168,6 @@ ALTER SEQUENCE public.ingredients_id_seq OWNED BY public.ingredients.id;
 CREATE TABLE public.products (
     id bigint NOT NULL,
     name character varying NOT NULL,
-    author_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -196,13 +185,6 @@ COMMENT ON TABLE public.products IS 'Продукты';
 --
 
 COMMENT ON COLUMN public.products.name IS 'Название';
-
-
---
--- Name: COLUMN products.author_id; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.products.author_id IS 'Автор';
 
 
 --
@@ -295,7 +277,6 @@ CREATE TABLE public.tags (
     id bigint NOT NULL,
     name character varying NOT NULL,
     color character varying NOT NULL,
-    author_id bigint NOT NULL,
     context character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -324,13 +305,6 @@ COMMENT ON COLUMN public.tags.color IS 'Цвет';
 
 
 --
--- Name: COLUMN tags.author_id; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.tags.author_id IS 'Автор';
-
-
---
 -- Name: COLUMN tags.context; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -354,51 +328,6 @@ CREATE SEQUENCE public.tags_id_seq
 --
 
 ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
-
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.users (
-    id bigint NOT NULL,
-    email character varying NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: TABLE users; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE public.users IS 'Пользователи';
-
-
---
--- Name: COLUMN users.email; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.users.email IS 'Почта';
-
-
---
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.users_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
@@ -434,13 +363,6 @@ ALTER TABLE ONLY public.tag_links ALTER COLUMN id SET DEFAULT nextval('public.ta
 --
 
 ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
-
-
---
--- Name: users id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
@@ -500,21 +422,6 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
---
--- Name: index_dishes_on_author_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_dishes_on_author_id ON public.dishes USING btree (author_id);
-
-
---
 -- Name: index_ingredients_on_dish_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -526,13 +433,6 @@ CREATE INDEX index_ingredients_on_dish_id ON public.ingredients USING btree (dis
 --
 
 CREATE INDEX index_ingredients_on_product_id ON public.ingredients USING btree (product_id);
-
-
---
--- Name: index_products_on_author_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_products_on_author_id ON public.products USING btree (author_id);
 
 
 --
@@ -557,20 +457,6 @@ CREATE UNIQUE INDEX index_tag_links_on_target_id_and_tag_id ON public.tag_links 
 
 
 --
--- Name: index_tags_on_author_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tags_on_author_id ON public.tags USING btree (author_id);
-
-
---
--- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
-
-
---
 -- Name: ingredients fk_rails_17c82ffdc6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -579,35 +465,11 @@ ALTER TABLE ONLY public.ingredients
 
 
 --
--- Name: dishes fk_rails_a0b05cb66a; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.dishes
-    ADD CONSTRAINT fk_rails_a0b05cb66a FOREIGN KEY (author_id) REFERENCES public.users(id);
-
-
---
--- Name: tags fk_rails_c074e4ce5b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tags
-    ADD CONSTRAINT fk_rails_c074e4ce5b FOREIGN KEY (author_id) REFERENCES public.users(id);
-
-
---
 -- Name: ingredients fk_rails_db974bf3ef; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.ingredients
     ADD CONSTRAINT fk_rails_db974bf3ef FOREIGN KEY (product_id) REFERENCES public.products(id);
-
-
---
--- Name: products fk_rails_fcdcd47b60; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.products
-    ADD CONSTRAINT fk_rails_fcdcd47b60 FOREIGN KEY (author_id) REFERENCES public.users(id);
 
 
 --
@@ -621,6 +483,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211117082734'),
 ('20211117112952'),
 ('20211118113451'),
-('20211202070743');
+('20211202070743'),
+('20230127075030');
 
 

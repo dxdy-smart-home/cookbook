@@ -1,5 +1,4 @@
 class Tag < ApplicationRecord
-  belongs_to :author, class_name: 'User'
   has_many :tag_links, dependent: :delete_all
 
   validates :name, :context, presence: true

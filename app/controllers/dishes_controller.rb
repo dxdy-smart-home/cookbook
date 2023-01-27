@@ -2,7 +2,7 @@ class DishesController < ApplicationController
   helper_method :tags_resource, :products_resource
 
   def index
-    dishes = current_user.dishes.includes(:tags)
+    dishes = Dish.includes(:tags)
     grouped_dishes = dishes.each_with_object(Hash.new(SortedSet.new)) do |dish, hash|
       dish.tags.each { |tag| hash[tag] |= [dish] }
       hash
@@ -12,12 +12,11 @@ class DishesController < ApplicationController
   end
 
   def new
-    dish = current_user.dishes.new
-    render locals: { dish: dish }
+    render locals: { dish: Dish.new }
   end
 
   def create
-    dish = current_user.dishes.new dishe_params
+    dish = Dish.new dishe_params
 
     if dish.save
       redirect_to dishes_path, notice: "Блюдо успешно создано"
@@ -27,12 +26,12 @@ class DishesController < ApplicationController
   end
 
   def edit
-    dish = current_user.dishes.find params[:id]
+    dish = Dish.find params[:id]
     render locals: { dish: dish }
   end
 
   def update
-    dish = current_user.dishes.find params[:id]
+    dish = Dish.find params[:id]
 
     if dish.update dishe_params
       redirect_to dishes_path, notice: "Блюдо успешно обновлено"
@@ -42,7 +41,7 @@ class DishesController < ApplicationController
   end
 
   def destroy
-    dish = current_user.dishes.find params[:id]
+    dish = Dish.find params[:id]
     dish.destroy
 
     redirect_to dishes_path, notice: 'Блюдо успешно удалено'
@@ -55,7 +54,7 @@ class DishesController < ApplicationController
   end
 
   def products_resource
-    @products_resource ||= current_user.products.ordered
+    @products_resource ||= Product.ordered
   end
 
   def dishe_params

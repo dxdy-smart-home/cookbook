@@ -1,16 +1,15 @@
 class CategoriesController < ApplicationController
   def index
-    categories = current_user.categories.ordered
+    categories = Category.ordered
     render locals: { categories: categories }
   end
 
   def new
-    category = current_user.categories.build(color: '#000000')
-    render locals: { category:category }
+    render locals: { category: Category.new(color: '#000000') }
   end
 
   def create
-    category = current_user.categories.build category_params
+    category = Category.new category_params
 
     if category.save
       redirect_to categories_path, notice: "Категория успешно создана"
@@ -20,12 +19,12 @@ class CategoriesController < ApplicationController
   end
 
   def edit
-    category = current_user.categories.find params[:id]
+    category = Category.find params[:id]
     render locals: { category: category }
   end
 
   def update
-    category = current_user.categories.find params[:id]
+    category = Category.find params[:id]
 
     if category.update category_params
       redirect_to categories_path, notice: "Категория успешно обновлена"
@@ -35,7 +34,7 @@ class CategoriesController < ApplicationController
   end
 
   def destroy
-    category = current_user.categories.find params[:id]
+    category = Category.find params[:id]
     category.destroy
 
     redirect_to categories_path, notice: "Категория успешно удалена"

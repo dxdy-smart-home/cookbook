@@ -2,8 +2,8 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: postgres
-  password: <%= ENV["COOKBOOK_DATABASE_PASSWORD"] %>
+  username: <%= ENV.fetch("COOKBOOK_DATABASE_USERNAME") { "postgres" } %>
+  password: <%= ENV.fetch("COOKBOOK_DATABASE_PASSWORD") { "postgres" } %>
   host: localhost
 
 development:

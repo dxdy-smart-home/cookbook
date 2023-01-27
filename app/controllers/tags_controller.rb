@@ -1,16 +1,15 @@
 class TagsController < ApplicationController
   def index
-    tags = current_user.tags.ordered
+    tags = Tag.ordered
     render locals: { tags: tags }
   end
 
   def new
-    tag = current_user.tags.build
-    render locals: { tag: tag }
+    render locals: { tag: Tag.new }
   end
 
   def create
-    tag = current_user.tags.build tag_params
+    tag = Tag.new tag_params
 
     if tag.save
       redirect_to tags_path, notice: "Тег успешно создан"
@@ -20,12 +19,12 @@ class TagsController < ApplicationController
   end
 
   def edit
-    tag = current_user.tags.find params[:id]
+    tag = Tag.find params[:id]
     render locals: { tag: tag }
   end
 
   def update
-    tag = current_user.tags.find params[:id]
+    tag = Tag.find params[:id]
 
     if tag.update tag_params
       redirect_to tags_path, notice: "Тег успешно обновлен"
@@ -35,7 +34,7 @@ class TagsController < ApplicationController
   end
 
   def destroy
-    tag = current_user.tags.find params[:id]
+    tag = Tag.find params[:id]
     tag.destroy
 
     redirect_to tags_path, notice: "Тег успешно удален"
